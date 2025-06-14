@@ -1,0 +1,10 @@
+{
+    "name": "WeaponsManager",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/RS-Mind/WeaponsManager",
+    "description": "A library to help mod developers to add additional guns to the player.",
+    "dependencies": [
+		"willis81808-UnboundLib-3.2.14",
+		"Pykess-ModdingUtils-0.4.8"
+    ]
+}

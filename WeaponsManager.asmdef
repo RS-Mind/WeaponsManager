@@ -1,0 +1,22 @@
+{
+    "name": "WeaponsManager",
+    "references": [
+        "UnboundLib",
+        "ModdingUtils"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "0Harmony.dll",
+        "BepInEx.dll",
+        "Assembly-CSharp.dll",
+        "PhotonUnityNetworking.dll",
+        "InControl.dll",
+        "PhotonRealtime.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
