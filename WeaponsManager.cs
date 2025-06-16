@@ -1,5 +1,7 @@
 ﻿using BepInEx;
 using HarmonyLib;
+using Jotunn.Utils;
+using UnityEngine;
 
 namespace WeaponsManager
 {
@@ -11,14 +13,20 @@ namespace WeaponsManager
     {
         private const string ModId = "com.rsmind.rounds.weaponsmanager";
         private const string ModName = "Weapon Manager";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
         public const string ModInitials = "WM";
+        internal static AssetBundle assets;
         public static WeaponsManager instance { get; private set; }
 
         void Awake()
         {
             var harmony = new Harmony(ModId);
             harmony.PatchAll();
+            assets = AssetUtils.LoadAssetBundleFromResources("weaponsmanager", typeof(WeaponsManager).Assembly);
+            if (assets == null)
+            {
+                UnityEngine.Debug.Log("Failed to load Weapons Manager asset bundle");
+            }
         }
 
 

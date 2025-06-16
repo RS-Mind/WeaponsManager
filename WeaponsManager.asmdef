@@ -2,7 +2,8 @@
     "name": "WeaponsManager",
     "references": [
         "UnboundLib",
-        "ModdingUtils"
+        "ModdingUtils",
+        "Unity.TextMeshPro"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

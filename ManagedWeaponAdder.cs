@@ -7,12 +7,12 @@ namespace WeaponsManager
     public class ManagedWeaponAdder : MonoBehaviour
     {
         public Gun weapon; // The weapon to be added to the player
+        public bool applyCardStats; // Should the weapon inherit stats from other cards?
+        public GameObject icon; // The icon to be displayed in the weapon UI
+        public string weaponName; // The name of the weapon for the UI
 
-        public bool applyCardStats;
-
-        public void Apply(Player player)
+        internal void Apply(Player player, WeaponManager weaponManager)
         {
-            WeaponManager weaponManager = player.gameObject.GetOrAddComponent<WeaponManager>();
             SetTeamColor[] setTeamColors = weapon.GetComponentsInChildren<SetTeamColor>();
             int layerID = player.gameObject.GetComponentInChildren<SpriteMask>().frontSortingLayerID;
             foreach (SetTeamColor color in setTeamColors)
@@ -21,11 +21,7 @@ namespace WeaponsManager
                 mask.frontSortingLayerID = layerID;
                 mask.backSortingLayerID = layerID;
             }
-            try
-            {
-                weaponManager.AddWeapon(weapon, applyCardStats);
-            }
-            catch { }
+            weaponManager.AddWeapon(weapon, applyCardStats, icon, weaponName);
         }
     }
 
@@ -37,7 +33,8 @@ namespace WeaponsManager
         {
             if (__instance.GetComponent<ManagedWeaponAdder>() is ManagedWeaponAdder adder)
             {
-                adder.Apply(___playerToUpgrade);
+                WeaponManager weaponManager = ___playerToUpgrade.gameObject.GetOrAddComponent<WeaponManager>();
+                adder.Apply(___playerToUpgrade, weaponManager);
             }
         }
     }
