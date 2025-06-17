@@ -18,3 +18,5 @@ A library to help mod developers to add additional guns to the player. Guns adde
 	- This icon can easily be the same as a FancyCardBar icon
 7. Add a name for your weapon
 	- This is used in the UI to help identify your gun.
+	
+Note: custom gun sounds are currently unsupported

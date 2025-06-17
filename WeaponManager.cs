@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
 using InControl.NativeProfile;
 using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnboundLib;
+using UnboundLib.GameModes;
 using UnityEngine;
 
 namespace WeaponsManager
@@ -52,7 +54,8 @@ namespace WeaponsManager
 
         public void Start()
         {
-            
+            visualizer.SetActive(false);
+            GameModeManager.AddHook(GameModeHooks.HookRoundStart, RoundStart);
         }
 
         public void AddWeapon(Gun weapon, bool applyCardStats, GameObject icon, string name)
@@ -85,6 +88,8 @@ namespace WeaponsManager
                     ApplyCardStats.CopyGunStats(weapons[0], newWeapon);
                 } catch { }
             }
+            newWeapon.soundGun = weapons[0].soundGun;
+            visualizer.SetActive(true);
         }
 
         private void UpdateIcons()
@@ -151,22 +156,38 @@ namespace WeaponsManager
 
             if ((int)ammo.GetFieldValue("currentAmmo") <= 0)
             {
-                ammo.reloadAnim.PlayIn();
+                try
+                {
+                    ammo.reloadAnim.PlayIn();
+                }
+                catch { }
             }
             else
             {
-                ammo.reloadAnim.PlayOut();
+                try
+                {
+                    ammo.reloadAnim.PlayOut();
+                }
+                catch { }
             }
 
             for (int i = 1; i < ammo.populate.transform.childCount; i++)
             {
                 if (i <= (int)ammo.GetFieldValue("currentAmmo"))
                 {
-                    ammo.populate.transform.GetChild(i).GetComponent<CurveAnimation>().PlayIn();
+                    try
+                    {
+                        ammo.populate.transform.GetChild(i).GetComponent<CurveAnimation>().PlayIn();
+                    }
+                    catch { }
                 }
                 else
                 {
-                    ammo.populate.transform.GetChild(i).GetComponent<CurveAnimation>().PlayOut();
+                    try
+                    {
+                        ammo.populate.transform.GetChild(i).GetComponent<CurveAnimation>().PlayOut();
+                    }
+                    catch { }
                 }
             }
 
@@ -194,6 +215,21 @@ namespace WeaponsManager
         public void RPCPreviousWeapon()
         {
             PreviousWeapon();
+        }
+
+        private IEnumerator RoundStart(IGameModeHandler gm)
+        {
+            foreach (Gun gun in weapons)
+            {
+                gun.sinceAttack = 100f;
+                gun.gameObject.GetComponentInChildren<GunAmmo>()?.ReloadAmmo();
+            }
+            yield break;
+        }
+
+        private void OnDestroy()
+        {
+            GameModeManager.RemoveHook(GameModeHooks.HookRoundStart, RoundStart);
         }
     }
 
