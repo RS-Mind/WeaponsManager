@@ -16,7 +16,8 @@
         "Assembly-CSharp.dll",
         "PhotonUnityNetworking.dll",
         "InControl.dll",
-        "PhotonRealtime.dll"
+        "PhotonRealtime.dll",
+        "SonigonAudioEngine.Runtime.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": []

@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
 using InControl.NativeProfile;
 using Photon.Pun;
+using SoundImplementation;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnboundLib;
 using UnboundLib.GameModes;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace WeaponsManager
 {
@@ -88,8 +90,51 @@ namespace WeaponsManager
                     ApplyCardStats.CopyGunStats(weapons[0], newWeapon);
                 } catch { }
             }
-            newWeapon.soundGun = weapons[0].soundGun;
+            FixedNewGunSound(newWeapon);
+
             visualizer.SetActive(true);
+        }
+
+        private void FixedNewGunSound(Gun gun) 
+        {
+            GunAmmo newAmmo = gun.GetComponentInChildren<GunAmmo>();
+            SoundGun soundGun = gun.soundGun;
+
+            AudioMixerGroup sdxAudioGroup = SoundVolumeManager.Instance.audioMixer.FindMatchingGroups("SFX")[0];
+
+            newAmmo.soundReloadComplete.variables.audioMixerGroup = sdxAudioGroup;
+            newAmmo.soundReloadInProgressLoop.variables.audioMixerGroup = sdxAudioGroup;
+
+            // Also apply the audio mixer group to all sound events in the reload loop
+            foreach(var soundEvent in newAmmo.soundReloadInProgressLoop.variables.triggerOnPlaySoundEvents) 
+            {
+                soundEvent.variables.audioMixerGroup = sdxAudioGroup;
+            }
+
+            foreach(var soundEvent in newAmmo.soundReloadInProgressLoop.variables.triggerOnStopSoundEvents) 
+            {
+                soundEvent.variables.audioMixerGroup = sdxAudioGroup;
+            }
+
+            // Apply the audio mixer group to all sound events in the gun
+            soundGun.soundShotModifierBasic.single.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundShotModifierBasic.singleAutoLoop.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundShotModifierBasic.singleAutoTail.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundShotModifierBasic.shotgun.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundShotModifierBasic.shotgunAutoLoop.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundShotModifierBasic.shotgunAutoTail.variables.audioMixerGroup = sdxAudioGroup;
+
+            soundGun.soundImpactModifierBasic.impactCharacter.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundImpactModifierBasic.impactEnvironment.variables.audioMixerGroup = sdxAudioGroup;
+
+            soundGun.soundImpactModifierDamageToExplosionHuge.impactCharacter.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundImpactModifierDamageToExplosionHuge.impactEnvironment.variables.audioMixerGroup = sdxAudioGroup;
+
+            soundGun.soundImpactModifierDamageToExplosionMedium.impactCharacter.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundImpactModifierDamageToExplosionMedium.impactEnvironment.variables.audioMixerGroup = sdxAudioGroup;
+
+            soundGun.soundImpactBounce.variables.audioMixerGroup = sdxAudioGroup;
+            soundGun.soundImpactBullet.variables.audioMixerGroup = sdxAudioGroup;
         }
 
         private void UpdateIcons()
