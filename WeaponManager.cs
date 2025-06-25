@@ -41,7 +41,7 @@ namespace WeaponsManager
             shouldUpdateStats.Add(true);
             if (player.data.view.IsMine)
             {
-                visualizer = Instantiate(WeaponsManager.assets.LoadAsset<GameObject>("SlotVisualizer"));
+                visualizer = Instantiate(WeaponsManager.assets.LoadAsset<GameObject>("SlotVisualizer"), GameObject.Find("Game/UI/UI_Game/Canvas").transform);
                 visualizer.GetComponent<Canvas>().sortingLayerName = "MostFront";
                 activeSlot = visualizer.transform.GetChild(0);
                 prevSlot = visualizer.transform.GetChild(1);

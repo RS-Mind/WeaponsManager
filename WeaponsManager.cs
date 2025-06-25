@@ -17,7 +17,7 @@ namespace WeaponsManager
     {
         private const string ModId = "com.rsmind.rounds.weaponsmanager";
         private const string ModName = "Weapon Manager";
-        public const string Version = "1.2.0";
+        public const string Version = "1.2.1";
         public const string ModInitials = "WM";
         internal static AssetBundle assets;
         public static WeaponsManager instance { get; private set; }
