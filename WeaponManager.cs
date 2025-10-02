@@ -14,12 +14,14 @@ namespace WeaponsManager
 {
     public class WeaponManager : MonoBehaviour
     {
-        internal List<Gun> weapons = new List<Gun>();
-        internal List<bool> shouldUpdateStats = new List<bool>();
-        internal List<GameObject> icons = new List<GameObject>();
-        internal List<string> names = new List<string>();
+        public List<Gun> weapons = new List<Gun>();
+        public List<bool> shouldUpdateStats = new List<bool>();
+        public List<bool> willReload = new List<bool>();
+        public List<GameObject> icons = new List<GameObject>();
+        public List<string> names = new List<string>();
+        public List<float> reloadTimers = new List<float>();
         private Player player;
-        internal int activeWeapon = 0;
+        public int activeWeapon { get; private set; } = 0;
         private WeaponHandler weaponHandler;
         private Holding holding;
 
@@ -39,6 +41,8 @@ namespace WeaponsManager
             Gun gun = player.data.weaponHandler.gun;
             weapons.Add(gun);
             shouldUpdateStats.Add(true);
+            willReload.Add(false);
+            reloadTimers.Add(0f);
             if (player.data.view.IsMine)
             {
                 visualizer = Instantiate(WeaponsManager.assets.LoadAsset<GameObject>("SlotVisualizer"), GameObject.Find("Game/UI/UI_Game/Canvas").transform);
@@ -60,11 +64,22 @@ namespace WeaponsManager
             GameModeManager.AddHook(GameModeHooks.HookRoundStart, RoundStart);
         }
 
+        public void FixedUpdate()
+        {
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                if (i == activeWeapon) continue;
+                reloadTimers[i] += Time.deltaTime / 4;
+            }
+        }
+
         public void AddWeapon(Gun weapon, bool applyCardStats, GameObject icon, string name)
         {
             Gun newWeapon = Instantiate(weapon);
             weapons.Add(newWeapon);
             shouldUpdateStats.Add(applyCardStats);
+            willReload.Add(false);
+            reloadTimers.Add(0f);
             if (player.data.view.IsMine)
             {
                 icons.Add(Instantiate(icon, visualizer.transform));
@@ -90,12 +105,12 @@ namespace WeaponsManager
                     ApplyCardStats.CopyGunStats(weapons[0], newWeapon);
                 } catch { }
             }
-            FixedNewGunSound(newWeapon);
 
+            FixNewGunSound(newWeapon);
             visualizer.SetActive(true);
         }
 
-        private void FixedNewGunSound(Gun gun) 
+        private void FixNewGunSound(Gun gun) 
         {
             GunAmmo newAmmo = gun.GetComponentInChildren<GunAmmo>();
             SoundGun soundGun = gun.soundGun;
@@ -106,12 +121,12 @@ namespace WeaponsManager
             newAmmo.soundReloadInProgressLoop.variables.audioMixerGroup = sdxAudioGroup;
 
             // Also apply the audio mixer group to all sound events in the reload loop
-            foreach(var soundEvent in newAmmo.soundReloadInProgressLoop.variables.triggerOnPlaySoundEvents) 
+            foreach (var soundEvent in newAmmo.soundReloadInProgressLoop.variables.triggerOnPlaySoundEvents)
             {
                 soundEvent.variables.audioMixerGroup = sdxAudioGroup;
             }
 
-            foreach(var soundEvent in newAmmo.soundReloadInProgressLoop.variables.triggerOnStopSoundEvents) 
+            foreach (var soundEvent in newAmmo.soundReloadInProgressLoop.variables.triggerOnStopSoundEvents)
             {
                 soundEvent.variables.audioMixerGroup = sdxAudioGroup;
             }
@@ -137,7 +152,7 @@ namespace WeaponsManager
             soundGun.soundImpactBullet.variables.audioMixerGroup = sdxAudioGroup;
         }
 
-        private void UpdateIcons()
+        public void UpdateIcons()
         {
             foreach (GameObject icon in icons)
                 icon.transform.SetYPosition(-1000); // Get all icons offscreen 
@@ -172,6 +187,8 @@ namespace WeaponsManager
             shouldUpdateStats.RemoveAt(i);
             icons.RemoveAt(i);
             names.RemoveAt(i);
+            willReload.RemoveAt(i);
+            reloadTimers.RemoveAt(i);
         }
 
         public void NextWeapon()
@@ -236,6 +253,16 @@ namespace WeaponsManager
                 }
             }
 
+            ammo.SetFieldValue("reloadCounter", (float)ammo.GetFieldValue("reloadCounter") - reloadTimers[index]);
+            reloadTimers[index] = 0f;
+
+            if (willReload[index])
+            {
+                weapons[index].sinceAttack = 100f;
+                weapons[index].gameObject.GetComponentInChildren<GunAmmo>()?.ReloadAmmo();
+                willReload[index] = false;
+            }
+
             if (player.data.view.IsMine)
                 UpdateIcons();
         }
@@ -264,10 +291,10 @@ namespace WeaponsManager
 
         private IEnumerator RoundStart(IGameModeHandler gm)
         {
-            foreach (Gun gun in weapons)
+            for (int i = 0; i < willReload.Count; i++)
             {
-                gun.sinceAttack = 100f;
-                gun.gameObject.GetComponentInChildren<GunAmmo>()?.ReloadAmmo();
+                if (i != activeWeapon)
+                willReload[i] = true;
             }
             yield break;
         }

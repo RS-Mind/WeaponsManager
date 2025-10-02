@@ -1,5 +1,5 @@
 # Weapons Manager
-A library to help mod developers to add additional guns to the player. Guns added by this mod can be swapped between using Q/E or R/L DPad. While inactive, a gun will be frozen, not reloading or refreshing attack cooldown.
+A library to help mod developers to add additional guns to the player. Guns added by this mod can be swapped between using Q/E or R/L DPad. While inactive, a gun will reload slowly.
 
 ## Usage Guide for Developers:
 1. Import the included unitypackage into your Unity project.
@@ -18,5 +18,3 @@ A library to help mod developers to add additional guns to the player. Guns adde
 	- This icon can easily be the same as a FancyCardBar icon
 7. Add a name for your weapon
 	- This is used in the UI to help identify your gun.
-	
-Note: custom gun sounds are currently unsupported

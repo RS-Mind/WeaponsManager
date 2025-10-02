@@ -1,3 +1,6 @@
+#### 1.3.0:
+- Made inactive guns reload slowly
+
 #### 1.2.1:
 - Merged Aalund's gun sound fix PR
 - Made the UI properly  a UI element

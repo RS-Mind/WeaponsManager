@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using WeaponsManager;
 
-namespace RSClasses.Utilities // Adds actions to players
+namespace WeaponsManager.Utilities // Adds actions to players
 {
     [Serializable]
     public class PlayerActionsAdditionalData
