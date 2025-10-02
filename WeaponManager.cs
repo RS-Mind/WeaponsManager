@@ -69,7 +69,7 @@ namespace WeaponsManager
             for (int i = 0; i < weapons.Count; i++)
             {
                 if (i == activeWeapon) continue;
-                reloadTimers[i] += Time.deltaTime / 4;
+                reloadTimers[i] += Time.fixedDeltaTime / 4;
             }
         }
 

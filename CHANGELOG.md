@@ -1,3 +1,6 @@
+#### 1.3.1:
+- I did an oopsie
+
 #### 1.3.0:
 - Made inactive guns reload slowly
 
