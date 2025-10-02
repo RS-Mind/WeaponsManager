@@ -1,3 +1,6 @@
+#### 1.3.2:
+- Allowed mod developers to set custom passive reload modifiers
+
 #### 1.3.1:
 - I did an oopsie
 

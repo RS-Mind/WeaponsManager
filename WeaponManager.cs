@@ -20,6 +20,7 @@ namespace WeaponsManager
         public List<GameObject> icons = new List<GameObject>();
         public List<string> names = new List<string>();
         public List<float> reloadTimers = new List<float>();
+        public List<float> reloadMultipliers = new List<float>();
         private Player player;
         public int activeWeapon { get; private set; } = 0;
         private WeaponHandler weaponHandler;
@@ -43,6 +44,7 @@ namespace WeaponsManager
             shouldUpdateStats.Add(true);
             willReload.Add(false);
             reloadTimers.Add(0f);
+            reloadMultipliers.Add(0.25f);
             if (player.data.view.IsMine)
             {
                 visualizer = Instantiate(WeaponsManager.assets.LoadAsset<GameObject>("SlotVisualizer"), GameObject.Find("Game/UI/UI_Game/Canvas").transform);
@@ -69,17 +71,18 @@ namespace WeaponsManager
             for (int i = 0; i < weapons.Count; i++)
             {
                 if (i == activeWeapon) continue;
-                reloadTimers[i] += Time.fixedDeltaTime / 4;
+                reloadTimers[i] += Time.fixedDeltaTime * reloadMultipliers[i];
             }
         }
 
-        public void AddWeapon(Gun weapon, bool applyCardStats, GameObject icon, string name)
+        public void AddWeapon(Gun weapon, bool applyCardStats, GameObject icon, string name, float reloadMultiplier = 0.25f)
         {
             Gun newWeapon = Instantiate(weapon);
             weapons.Add(newWeapon);
             shouldUpdateStats.Add(applyCardStats);
             willReload.Add(false);
             reloadTimers.Add(0f);
+            reloadMultipliers.Add(reloadMultiplier);
             if (player.data.view.IsMine)
             {
                 icons.Add(Instantiate(icon, visualizer.transform));
@@ -189,6 +192,7 @@ namespace WeaponsManager
             names.RemoveAt(i);
             willReload.RemoveAt(i);
             reloadTimers.RemoveAt(i);
+            reloadMultipliers.RemoveAt(i);
         }
 
         public void NextWeapon()

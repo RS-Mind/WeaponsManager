@@ -8,6 +8,7 @@ namespace WeaponsManager
     {
         public Gun weapon; // The weapon to be added to the player
         public bool applyCardStats; // Should the weapon inherit stats from other cards?
+        public float inactiveReloadTimeMultiplier; // Modifies the reload time while the weapon is inactive. Set to 0 to disable passive reload.
         public GameObject icon; // The icon to be displayed in the weapon UI
         public string weaponName; // The name of the weapon for the UI
 
@@ -21,7 +22,7 @@ namespace WeaponsManager
                 mask.frontSortingLayerID = layerID;
                 mask.backSortingLayerID = layerID;
             }
-            weaponManager.AddWeapon(weapon, applyCardStats, icon, weaponName);
+            weaponManager.AddWeapon(weapon, applyCardStats, icon, weaponName, inactiveReloadTimeMultiplier);
         }
     }
 
