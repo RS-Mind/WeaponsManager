@@ -2,6 +2,7 @@
 using InControl.NativeProfile;
 using Photon.Pun;
 using SoundImplementation;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -62,7 +63,10 @@ namespace WeaponsManager
 
         public void Start()
         {
-            visualizer.SetActive(false);
+            if (player.data.view.IsMine)
+            {
+                visualizer.SetActive(false);
+            }
             GameModeManager.AddHook(GameModeHooks.HookRoundStart, RoundStart);
         }
 
@@ -109,8 +113,13 @@ namespace WeaponsManager
                 } catch { }
             }
 
+
             FixNewGunSound(newWeapon);
-            visualizer.SetActive(true);
+            if (player.data.view.IsMine)
+            {
+                newWeapon.AddAttackAction(new Action(player.GetComponent<SyncPlayerMovement>().SendShoot));
+                visualizer.SetActive(true);
+            }
         }
 
         private void FixNewGunSound(Gun gun) 
@@ -263,7 +272,7 @@ namespace WeaponsManager
             if (willReload[index])
             {
                 weapons[index].sinceAttack = 100f;
-                weapons[index].gameObject.GetComponentInChildren<GunAmmo>()?.ReloadAmmo();
+                try { weapons[index].gameObject.GetComponentInChildren<GunAmmo>()?.ReloadAmmo(); } catch { }
                 willReload[index] = false;
             }
 

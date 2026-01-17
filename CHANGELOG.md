@@ -1,3 +1,9 @@
+#### 1.3.4:
+- Fixed some issues with gun sounds not playing to non-local players
+
+#### 1.3.3:
+- Fixed some errors
+
 #### 1.3.2:
 - Allowed mod developers to set custom passive reload modifiers
 

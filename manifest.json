@@ -1,6 +1,6 @@
 {
     "name": "WeaponsManager",
-    "version_number": "1.3.2",
+    "version_number": "1.3.4",
     "website_url": "https://github.com/RS-Mind/WeaponsManager",
     "description": "A library to help mod developers to add additional guns to the player.",
     "dependencies": [
