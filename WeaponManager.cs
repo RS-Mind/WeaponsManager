@@ -5,6 +5,7 @@ using SoundImplementation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using TMPro;
 using UnboundLib;
 using UnboundLib.GameModes;
@@ -17,6 +18,7 @@ namespace WeaponsManager
     {
         public List<Gun> weapons = new List<Gun>();
         public List<bool> shouldUpdateStats = new List<bool>();
+        public List<bool> shouldIgnoreSounds = new List<bool>();
         public List<bool> willReload = new List<bool>();
         public List<GameObject> icons = new List<GameObject>();
         public List<string> names = new List<string>();
@@ -24,6 +26,7 @@ namespace WeaponsManager
         public List<float> reloadMultipliers = new List<float>();
         private Player player;
         public int activeWeapon { get; private set; } = 0;
+        public bool disableDefaultWeapon = false;
         private WeaponHandler weaponHandler;
         private Holding holding;
 
@@ -43,6 +46,7 @@ namespace WeaponsManager
             Gun gun = player.data.weaponHandler.gun;
             weapons.Add(gun);
             shouldUpdateStats.Add(true);
+            shouldIgnoreSounds.Add(true);
             willReload.Add(false);
             reloadTimers.Add(0f);
             reloadMultipliers.Add(0.25f);
@@ -79,11 +83,35 @@ namespace WeaponsManager
             }
         }
 
-        public void AddWeapon(Gun weapon, bool applyCardStats, GameObject icon, string name, float reloadMultiplier = 0.25f)
+        /// <summary>
+        /// Returns the first weapon with matching name. Returns null if the weapon isn't found
+        /// </summary>
+        /// <param name="name">The name of the desired weapon's prefab.</param>
+        /// <returns></returns>
+        public Gun GetWeapon(string name)
+        {
+            name += "(Clone)";
+            foreach (var weapon in weapons) if (weapon.name == name)
+                    return weapon;
+            return null;
+        }
+
+        /// <summary>
+        /// Adds a weapon to the player
+        /// </summary>
+        /// <param name="weapon">The weapon to be added.</param>
+        /// <param name="applyCardStats">If disabled, the weapon ignores stat changes from cards.</param>
+        /// <param name="icon">The icon for the weapon in the HUD.</param>
+        /// <param name="name">The name of the weapon in the HUD.</param>
+        /// <param name="reloadMultiplier">A multiplier on the weapon's reload speed while inactive.</param>
+        /// <param name="ignoreSoundChanges">If enabled, the weapon does not inherit sounds from cards.</param>
+        /// <param name="disableBasicGun">If enabled, the player loses access to their original gun. Other weapons may still be used.</param>
+        public void AddWeapon(Gun weapon, bool applyCardStats, GameObject icon, string name, float reloadMultiplier = 0.25f, bool ignoreSoundChanges = false, bool disableBasicGun = false)
         {
             Gun newWeapon = Instantiate(weapon);
             weapons.Add(newWeapon);
             shouldUpdateStats.Add(applyCardStats);
+            shouldIgnoreSounds.Add(ignoreSoundChanges);
             willReload.Add(false);
             reloadTimers.Add(0f);
             reloadMultipliers.Add(reloadMultiplier);
@@ -113,12 +141,19 @@ namespace WeaponsManager
                 } catch { }
             }
 
+            if (disableBasicGun)
+            {
+                disableDefaultWeapon = true;
+                if (activeWeapon == 0)
+                    SetActiveWeapon(1);
+            }
 
             FixNewGunSound(newWeapon);
             if (player.data.view.IsMine)
             {
                 newWeapon.AddAttackAction(new Action(player.GetComponent<SyncPlayerMovement>().SendShoot));
-                visualizer.SetActive(true);
+                if (!disableBasicGun || weapons.Count > 2)
+                    visualizer.SetActive(true);
             }
         }
 
@@ -169,7 +204,9 @@ namespace WeaponsManager
             foreach (GameObject icon in icons)
                 icon.transform.SetYPosition(-1000); // Get all icons offscreen 
 
-            if (weapons.Count > 2) // Set the icons properly
+            int weaponCount = disableDefaultWeapon ? weapons.Count - 1 : weapons.Count; // Exclude the default weapon when disabled
+
+            if (weaponCount > 2) // Set the icons properly
             {
                 icons[((activeWeapon + icons.Count - 1) % icons.Count)].transform.SetPositionAndRotation(prevSlot.position, prevSlot.rotation);
                 icons[((activeWeapon + icons.Count - 1) % icons.Count)].transform.localScale = new Vector3(2, 2, 2);
@@ -178,7 +215,7 @@ namespace WeaponsManager
             else
                 prevName.text = "";
 
-            if (weapons.Count > 1)
+            if (weaponCount > 1)
             {
                 icons[(activeWeapon + 1) % icons.Count].transform.SetPositionAndRotation(nextSlot.position, nextSlot.rotation);
                 icons[(activeWeapon + 1) % icons.Count].transform.localScale = new Vector3(2, 2, 2);
@@ -192,11 +229,18 @@ namespace WeaponsManager
             activeName.text = names[activeWeapon];
         }
 
+        /// <summary>
+        /// Removes a weapon from the player
+        /// </summary>
+        /// <param name="weapon">A predicate matching the weapon to be removed</param>
         public void RemoveWeapon(System.Predicate<Gun> weapon)
         {
             int i = weapons.FindIndex(weapon);
+            if (i == 0)
+                return;
             weapons.RemoveAt(i);
             shouldUpdateStats.RemoveAt(i);
+            shouldIgnoreSounds.RemoveAt(i);
             icons.RemoveAt(i);
             names.RemoveAt(i);
             willReload.RemoveAt(i);
@@ -206,12 +250,18 @@ namespace WeaponsManager
 
         public void NextWeapon()
         {
-            SetActiveWeapon((activeWeapon + 1) % weapons.Count);
+            activeWeapon = (activeWeapon + 1) % weapons.Count;
+            if (activeWeapon == 0 && disableDefaultWeapon) // Skip the default gun when disabled
+                activeWeapon = 1;
+            SetActiveWeapon(activeWeapon);
         }
 
         public void PreviousWeapon()
         {
-            SetActiveWeapon((activeWeapon - 1 + weapons.Count) % weapons.Count);
+            activeWeapon = (activeWeapon - 1 + weapons.Count) % weapons.Count;
+            if (activeWeapon == 0 && disableDefaultWeapon) // Skip the default gun when disabled
+                activeWeapon = weapons.Count - 1;
+            SetActiveWeapon(activeWeapon);
         }
         private void SetActiveWeapon(int index)
         {

@@ -1,3 +1,7 @@
+#### 1.4.0:
+- Added option to disable sound changes on a custom weapon
+- Added option to disable default weapon when adding a weapon
+
 #### 1.3.4:
 - Fixed some issues with gun sounds not playing to non-local players
 

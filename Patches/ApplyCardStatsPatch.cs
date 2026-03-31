@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using SoundImplementation;
 using System.Collections;
 using System.Collections.Generic;
 using UnboundLib;
@@ -11,22 +12,34 @@ namespace WeaponsManager.Patches
     [HarmonyPriority(Priority.High)]
     class ApplyCardStatsPatch
     {
+        static List<SoundShotModifier> soundShotModifier = null;
+        static List<SoundImpactModifier> soundImpactModifier = null;
         private static void Prefix(ApplyCardStats __instance, Player ___playerToUpgrade, Gun ___myGunStats, out int __state)
         {
+            soundShotModifier = null;
+            soundImpactModifier = null;
             __state = -1;
             WeaponManager weaponManager = ___playerToUpgrade.gameObject.GetComponent<WeaponManager>();
-            if (weaponManager != null && !weaponManager.shouldUpdateStats[weaponManager.activeWeapon])
+            if (weaponManager != null)
             {
-                GunAmmo gunAmmo = weaponManager.weapons[weaponManager.activeWeapon].gameObject.GetComponentInChildren<GunAmmo>();
-
-                if (gunAmmo)
+                if (weaponManager.shouldIgnoreSounds[weaponManager.activeWeapon])
                 {
-                    gunAmmo.ammoReg -= ___myGunStats.ammoReg;
-                    gunAmmo.maxAmmo -= ___myGunStats.ammo;
-                    __state = gunAmmo.maxAmmo;
-                    if (___myGunStats.reloadTime != 0)
-                        gunAmmo.reloadTimeMultiplier /= ___myGunStats.reloadTime;
-                    gunAmmo.reloadTimeAdd -= ___myGunStats.reloadTimeAdd;
+                    soundShotModifier = new List<SoundShotModifier>((List<SoundShotModifier>)weaponManager.weapons[weaponManager.activeWeapon].soundGun.GetFieldValue("soundShotModifierAllList"));
+                    soundImpactModifier = new List<SoundImpactModifier>((List<SoundImpactModifier>)weaponManager.weapons[weaponManager.activeWeapon].soundGun.GetFieldValue("soundImpactModifierAllList"));
+                }
+                if (!weaponManager.shouldUpdateStats[weaponManager.activeWeapon])
+                {
+                    GunAmmo gunAmmo = weaponManager.weapons[weaponManager.activeWeapon].gameObject.GetComponentInChildren<GunAmmo>();
+
+                    if (gunAmmo)
+                    {
+                        gunAmmo.ammoReg -= ___myGunStats.ammoReg;
+                        gunAmmo.maxAmmo -= ___myGunStats.ammo;
+                        __state = gunAmmo.maxAmmo;
+                        if (___myGunStats.reloadTime != 0)
+                            gunAmmo.reloadTimeMultiplier /= ___myGunStats.reloadTime;
+                        gunAmmo.reloadTimeAdd -= ___myGunStats.reloadTimeAdd;
+                    }
                 }
             }
         }
@@ -36,6 +49,18 @@ namespace WeaponsManager.Patches
             WeaponManager weaponManager = ___playerToUpgrade.gameObject.GetComponent<WeaponManager>();
             if (weaponManager != null && ___myGunStats)
             {
+                if (weaponManager.shouldIgnoreSounds[weaponManager.activeWeapon])
+                {
+                    if (soundShotModifier != null)
+                        weaponManager.weapons[weaponManager.activeWeapon].soundGun.SetFieldValue("soundShotModifierAllList", soundShotModifier);
+                    if (soundImpactModifier != null)
+                        weaponManager.weapons[weaponManager.activeWeapon].soundGun.SetFieldValue("soundImpactModifierAllList", soundImpactModifier);
+                    try
+                    {
+                        weaponManager.weapons[weaponManager.activeWeapon].soundGun.RefreshSoundModifiers();
+                    }
+                    catch { }
+                }
                 if (__state != -1)
                 {
                     GunAmmo gunAmmo = weaponManager.weapons[weaponManager.activeWeapon].gameObject.GetComponentInChildren<GunAmmo>();
@@ -47,6 +72,12 @@ namespace WeaponsManager.Patches
                     if (i == weaponManager.activeWeapon) continue; // apply stats to guns that aren't active, exist, and are supposed to have their stats updated.
                     if (!weaponManager.weapons[i]) continue;
                     if (!weaponManager.shouldUpdateStats[i]) continue;
+
+                    if (weaponManager.shouldIgnoreSounds[i])
+                    {
+                        soundShotModifier = new List<SoundShotModifier>((List<SoundShotModifier>)weaponManager.weapons[i].soundGun.GetFieldValue("soundShotModifierAllList"));
+                        soundImpactModifier = new List<SoundImpactModifier>((List<SoundImpactModifier>)weaponManager.weapons[i].soundGun.GetFieldValue("soundImpactModifierAllList"));
+                    }
 
                     GunAmmo gunAmmo = weaponManager.weapons[i].gameObject.GetComponentInChildren<GunAmmo>();
 
@@ -69,6 +100,17 @@ namespace WeaponsManager.Patches
                         ApplyCardStats.CopyGunStats(___myGunStats, weaponManager.weapons[i]);
                     }
                     catch { }
+                    if (weaponManager.shouldIgnoreSounds[i])
+                    {
+                        if (soundShotModifier != null)
+                            weaponManager.weapons[i].soundGun.SetFieldValue("soundShotModifierAllList", soundShotModifier);
+                        if (soundImpactModifier != null)
+                            weaponManager.weapons[i].soundGun.SetFieldValue("soundImpactModifierAllList", soundImpactModifier);
+                        try
+                        {
+                            weaponManager.weapons[i].soundGun.RefreshSoundModifiers();
+                        } catch { }
+                    }
                 }
             }
         }

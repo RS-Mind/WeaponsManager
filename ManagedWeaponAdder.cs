@@ -11,6 +11,8 @@ namespace WeaponsManager
         public float inactiveReloadTimeMultiplier; // Modifies the reload time while the weapon is inactive. Set to 0 to disable passive reload.
         public GameObject icon; // The icon to be displayed in the weapon UI
         public string weaponName; // The name of the weapon for the UI
+        public bool ignoreSoundChanges;
+        public bool disableBasicGun; // Disable the player's orignal gun
 
         internal void Apply(Player player, WeaponManager weaponManager)
         {
@@ -22,7 +24,7 @@ namespace WeaponsManager
                 mask.frontSortingLayerID = layerID;
                 mask.backSortingLayerID = layerID;
             }
-            weaponManager.AddWeapon(weapon, applyCardStats, icon, weaponName, inactiveReloadTimeMultiplier);
+            weaponManager.AddWeapon(weapon, applyCardStats, icon, weaponName, inactiveReloadTimeMultiplier, ignoreSoundChanges, disableBasicGun);
         }
     }
 

@@ -85,6 +85,7 @@ namespace WeaponsManager.Utilities // Adds actions to players
         private static void Postfix(GeneralInput __instance)
         {
             if (!__instance.GetComponent<CharacterData>().view.IsMine) return;
+            if (__instance.GetComponentInChildren<PlayerAI>() != null) return; // No bots
             if (__instance.GetComponent<CharacterData>().playerActions.GetAdditionalData().nextWeapon.WasPressed && __instance.GetComponent<WeaponManager>() is WeaponManager weaponHandler)
             {
                 __instance.GetComponent<CharacterData>().view.RPC("RPCNextWeapon", RpcTarget.All);
