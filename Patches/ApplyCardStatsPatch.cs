@@ -33,12 +33,7 @@ namespace WeaponsManager.Patches
 
                     if (gunAmmo)
                     {
-                        gunAmmo.ammoReg -= ___myGunStats.ammoReg;
-                        gunAmmo.maxAmmo -= ___myGunStats.ammo;
                         __state = gunAmmo.maxAmmo;
-                        if (___myGunStats.reloadTime != 0)
-                            gunAmmo.reloadTimeMultiplier /= ___myGunStats.reloadTime;
-                        gunAmmo.reloadTimeAdd -= ___myGunStats.reloadTimeAdd;
                     }
                 }
             }
@@ -49,6 +44,20 @@ namespace WeaponsManager.Patches
             WeaponManager weaponManager = ___playerToUpgrade.gameObject.GetComponent<WeaponManager>();
             if (weaponManager != null && ___myGunStats)
             {
+                if (!weaponManager.shouldUpdateStats[weaponManager.activeWeapon])
+                {
+                    GunAmmo gunAmmo = weaponManager.weapons[weaponManager.activeWeapon].gameObject.GetComponentInChildren<GunAmmo>();
+
+                    if (gunAmmo)
+                    {
+                        gunAmmo.ammoReg -= ___myGunStats.ammoReg;
+                        gunAmmo.maxAmmo -= ___myGunStats.ammo;
+                        gunAmmo.maxAmmo = __state;
+                        if (___myGunStats.reloadTime != 0)
+                            gunAmmo.reloadTimeMultiplier /= ___myGunStats.reloadTime;
+                        gunAmmo.reloadTimeAdd -= ___myGunStats.reloadTimeAdd;
+                    }
+                }
                 if (weaponManager.shouldIgnoreSounds[weaponManager.activeWeapon])
                 {
                     if (soundShotModifier != null)
@@ -60,11 +69,6 @@ namespace WeaponsManager.Patches
                         weaponManager.weapons[weaponManager.activeWeapon].soundGun.RefreshSoundModifiers();
                     }
                     catch { }
-                }
-                if (__state != -1)
-                {
-                    GunAmmo gunAmmo = weaponManager.weapons[weaponManager.activeWeapon].gameObject.GetComponentInChildren<GunAmmo>();
-                    gunAmmo.maxAmmo = __state;
                 }
 
                 for (int i = 0; i < weaponManager.weapons.Count; i++)

@@ -266,7 +266,8 @@ namespace WeaponsManager
         private void SetActiveWeapon(int index)
         {
             // Disable previous weapon
-            weapons[activeWeapon].gameObject.SetActive(false);
+            foreach (var weapon in weapons)
+                weapon.gameObject.SetActive(false);
             weapons[index].transform.SetPositionAndRotation(weapons[activeWeapon].transform.position, weapons[activeWeapon].transform.rotation);
 
             // Enable new weapon
@@ -333,11 +334,19 @@ namespace WeaponsManager
         public void Reset()
         {
             SetActiveWeapon(0);
-            for (int i = weapons.Count - 1; i > 0; i++)
+            for (int i = weapons.Count - 1; i > 0; i--)
             {
-                Destroy(weapons[i]);
+                try
+                {
+                    Destroy(weapons[i]);
+                }
+                catch
+                {
+                    UnityEngine.Debug.LogWarning("WeaponManager.Reset() tried to delete a weapon but it didn't exist!");
+                }
             }
-            Destroy(this);
+            Destroy(visualizer);
+            Destroy(this.gameObject);
         }
 
         [PunRPC]

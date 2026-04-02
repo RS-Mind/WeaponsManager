@@ -1,3 +1,6 @@
+#### 1.4.1:
+- Fixed avoidable issues with WeaponsManager cleanup (sorry)
+
 #### 1.4.0:
 - Added option to disable sound changes on a custom weapon
 - Added option to disable default weapon when adding a weapon
