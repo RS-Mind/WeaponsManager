@@ -1,3 +1,6 @@
+#### 1.4.2:
+- Fixed issue exposed by recent update
+
 #### 1.4.1:
 - Fixed avoidable issues with WeaponsManager cleanup (sorry)
 

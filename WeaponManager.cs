@@ -346,7 +346,7 @@ namespace WeaponsManager
                 }
             }
             Destroy(visualizer);
-            Destroy(this.gameObject);
+            Destroy(this);
         }
 
         [PunRPC]
