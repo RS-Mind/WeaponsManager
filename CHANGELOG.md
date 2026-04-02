@@ -1,3 +1,6 @@
+#### 1.4.3:
+- Made resetting more intelligent
+
 #### 1.4.2:
 - Fixed issue exposed by recent update
 

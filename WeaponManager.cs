@@ -339,14 +339,20 @@ namespace WeaponsManager
                 try
                 {
                     Destroy(weapons[i]);
+                    weapons.RemoveAt(i);
+                    shouldUpdateStats.RemoveAt(i);
+                    shouldIgnoreSounds.RemoveAt(i);
+                    icons.RemoveAt(i);
+                    names.RemoveAt(i);
+                    willReload.RemoveAt(i);
+                    reloadTimers.RemoveAt(i);
+                    reloadMultipliers.RemoveAt(i);
                 }
                 catch
                 {
                     UnityEngine.Debug.LogWarning("WeaponManager.Reset() tried to delete a weapon but it didn't exist!");
                 }
             }
-            Destroy(visualizer);
-            Destroy(this);
         }
 
         [PunRPC]
@@ -374,6 +380,7 @@ namespace WeaponsManager
         private void OnDestroy()
         {
             GameModeManager.RemoveHook(GameModeHooks.HookRoundStart, RoundStart);
+            Destroy(visualizer);
         }
     }
 
