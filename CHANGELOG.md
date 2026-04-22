@@ -1,3 +1,6 @@
+#### 1.4.4:
+- Fixed an issue with resetting the default weapon
+
 #### 1.4.3:
 - Made resetting more intelligent
 

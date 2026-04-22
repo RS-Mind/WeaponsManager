@@ -333,6 +333,7 @@ namespace WeaponsManager
 
         public void Reset()
         {
+            disableDefaultWeapon = false;
             SetActiveWeapon(0);
             for (int i = weapons.Count - 1; i > 0; i--)
             {
