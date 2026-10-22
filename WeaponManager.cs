@@ -208,18 +208,24 @@ namespace WeaponsManager
 
             if (weaponCount > 2) // Set the icons properly
             {
-                icons[((activeWeapon + icons.Count - 1) % icons.Count)].transform.SetPositionAndRotation(prevSlot.position, prevSlot.rotation);
-                icons[((activeWeapon + icons.Count - 1) % icons.Count)].transform.localScale = new Vector3(2, 2, 2);
-                prevName.text = names[((activeWeapon + icons.Count - 1) % icons.Count)];
+                int previousIndex = (activeWeapon + icons.Count - 1) % icons.Count;
+                if (previousIndex == 0 && disableDefaultWeapon) // Skip the default gun when disabled
+                    previousIndex = icons.Count - 1;
+                icons[previousIndex].transform.SetPositionAndRotation(prevSlot.position, prevSlot.rotation);
+                icons[previousIndex].transform.localScale = new Vector3(2, 2, 2);
+                prevName.text = names[previousIndex];
             }
             else
                 prevName.text = "";
 
             if (weaponCount > 1)
             {
-                icons[(activeWeapon + 1) % icons.Count].transform.SetPositionAndRotation(nextSlot.position, nextSlot.rotation);
-                icons[(activeWeapon + 1) % icons.Count].transform.localScale = new Vector3(2, 2, 2);
-                nextName.text = names[(activeWeapon + 1) % icons.Count];
+                int nextIndex = (activeWeapon + 1) % icons.Count;
+                if (nextIndex == 0 && disableDefaultWeapon) // Skip the default gun when disabled
+                    nextIndex = 1;
+                icons[nextIndex].transform.SetPositionAndRotation(nextSlot.position, nextSlot.rotation);
+                icons[nextIndex].transform.localScale = new Vector3(2, 2, 2);
+                nextName.text = names[nextIndex];
             }
             else
                 nextName.text = "";

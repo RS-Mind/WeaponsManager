@@ -1,3 +1,6 @@
+#### 1.4.5:
+- Fixed an issue where the default weapon could appear on the GUI when disabled
+
 #### 1.4.4:
 - Fixed an issue with resetting the default weapon
 
